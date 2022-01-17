@@ -77,9 +77,9 @@ class Pager {
     TextElement result;
 
     if (element is Header) {
-      result = Header(content);
+      result = Header(content, reference: element.reference);
     } else {
-      result = Paragraph(content);
+      result = Paragraph(content, reference: element.reference);
     }
 
     return result;
