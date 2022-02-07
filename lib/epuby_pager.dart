@@ -19,7 +19,7 @@ class Pager {
   final BookRenderer renderer;
 
   Pager({required this.size, required this.renderer});
-    
+
   List<Page> paginate(Chapter chapter) {
     List<Page> result = [[]];
     var accumulator = 0.0;
@@ -32,7 +32,8 @@ class Pager {
         final free = _maxHeight - (accumulator - height);
 
         if (element is TextElement) {
-          final lineHeight = _calculateHeight(_copy(element, 'X'));
+          final lineHeight = _calculateHeight(
+              _copy(element, 'X', const TextOffset(start: 0, close: 0)));
 
           if (free >= lineHeight) {
             final splitted = _splitElement(element, free);
@@ -73,13 +74,13 @@ class Pager {
     return result;
   }
 
-  _copy(TextElement element, String content) {
+  _copy(TextElement element, String content, TextOffset offset) {
     TextElement result;
 
     if (element is Header) {
-      result = Header(content, reference: element.reference);
+      result = Header(content, reference: element.reference, offset: offset);
     } else {
-      result = Paragraph(content, reference: element.reference);
+      result = Paragraph(content, reference: element.reference, offset: offset);
     }
 
     return result;
@@ -103,7 +104,8 @@ class Pager {
 
     for (final word in words) {
       final newString = '$result $word';
-      final height = _calculateHeight(_copy(element, newString));
+      final height = _calculateHeight(
+          _copy(element, newString, const TextOffset(start: 0, close: 0)));
 
       if (height > free) {
         break;
@@ -112,9 +114,21 @@ class Pager {
       result = newString.trim();
     }
 
-    final first = _copy(element, result);
+    final first = _copy(
+        element,
+        result,
+        TextOffset(
+          start: 0,
+          close: result.length,
+        ));
     final tailContent = element.content.substring(result.length);
-    final second = _copy(element, tailContent);
+    final second = _copy(
+        element,
+        tailContent,
+        TextOffset(
+          start: result.length,
+          close: result.length + tailContent.length,
+        ));
 
     return [first, second];
   }
